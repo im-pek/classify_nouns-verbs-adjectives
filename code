@@ -1,0 +1,81 @@
+from textblob import TextBlob
+
+import nltk
+
+from collections import Counter
+
+noun_list=[]
+verb_list=[]
+adj_list=[]
+
+with open("2018 descriptions.txt") as file:  
+    data = file.read()
+    lowercasedata=data.lower()
+    lemmatised=TextBlob(lowercasedata)
+    ll=" ". join([w.lemmatize() for w in lemmatised.words])
+
+    text2 = nltk.word_tokenize(ll)
+    classify=nltk.pos_tag(text2)
+#    print (classify)
+
+    for pair in classify:
+        if 'NN' in pair:
+            noun_list.append(pair[0])
+        if 'VBP' in pair or 'VB' in pair or 'VBG' in pair or 'VBD' in pair or 'VBN' in pair or 'VBZ' in pair:
+            verb_list.append(pair[0])
+        if 'JJ' in pair or 'JJR' in pair or 'JJS' in pair:
+            adj_list.append(pair[0])
+
+stringed_nounlist=' '.join(noun_list)
+stringed_verblist=' '.join(verb_list)
+stringed_adjlist=' '.join(adj_list)
+           
+count_nouns = Counter(stringed_nounlist.split())
+count_verbs = Counter(stringed_verblist.split())
+count_adjs = Counter(stringed_adjlist.split())
+
+
+type_report_problem=lowercasedata.count('dear sir')
+type_call_in1=lowercasedata.count('customer called')
+type_call_in2=lowercasedata.count('user called')
+type_call_in=type_call_in1+type_call_in2
+by_lines=lowercasedata.split("\n")
+
+type_email_in=len(by_lines)-type_report_problem-type_call_in
+
+percent_report_problem=type_report_problem/len(by_lines)*100
+percent_call_in=type_call_in/len(by_lines)*100
+percent_email_in=type_email_in/len(by_lines)*100
+
+f=open('counts & percentages for help centre, 2015.txt', 'w')
+f.write('Nouns:')
+f.write('\n')
+f.write(str(count_nouns))
+f.write('\n')
+f.write('\n')
+f.write('Verbs:')
+f.write('\n')
+f.write(str(count_verbs))
+f.write('\n')
+f.write('\n')
+f.write('Adjectives:')
+f.write('\n')
+f.write(str(count_adjs))
+f.write('\n')
+f.write('\n')
+f.write('Complain through Report Problem Button: ')
+f.write(str(percent_report_problem))
+f.write('%')
+f.write('\n')
+f.write('Complain through Calling In: ')
+f.write(str(percent_call_in))
+f.write('%')
+f.write('\n')
+f.write('Complain through Emailing In: ')
+f.write(str(percent_email_in))
+f.write('%')
+f.write('\n')
+f.write('\n')
+f.write('Total Number of Feedback Entries: ')
+f.write(str(len(by_lines)))
+f.close()
